@@ -1,62 +1,67 @@
-[Project]
-FileName=Students.dev
-Name=Students
-Type=1
-Ver=2
-ObjFiles=
-Includes=
-Libs=
-PrivateResource=
-ResourceIncludes=
-MakeIncludes=
-Compiler=
-CppCompiler=
-Linker=
-IsCpp=0
-Icon=
-ExeOutput=
-ObjectOutput=
-LogOutput=
-LogOutputEnabled=0
-OverrideOutput=0
-OverrideOutputName=
-HostApplication=
-UseCustomMakefile=0
-CustomMakefile=
-CommandLine=
-Folders=
-IncludeVersionInfo=0
-SupportXPThemes=0
-CompilerSet=0
-CompilerSettings=0000000000000000000000000
-UnitCount=1
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-[VersionInfo]
-Major=1
-Minor=0
-Release=0
-Build=0
-LanguageID=1033
-CharsetID=1252
-CompanyName=
-FileVersion=
-FileDescription=Developed using the Dev-C++ IDE
-InternalName=
-LegalCopyright=
-LegalTrademarks=
-OriginalFilename=
-ProductName=
-ProductVersion=
-AutoIncBuildNr=0
-SyncProduct=1
+#define MAX_TAM 100
 
-[Unit1]
-FileName=trial1.c
-CompileCpp=0
-Folder=
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
+typedef struct students {
+    char nome[50];
+    char numero[50];
+    char curso[50];
+    char nota1[50];
+    char nota2[50];
+} students;
 
+int main() {
+    FILE *arquivo = fopen("DadosEntrada.csv", "r");
+    FILE *status = fopen("SituacaoFinal.csv", "w");
+    
+    if (arquivo == NULL || status == NULL) {
+        printf("Não foi possível abrir o arquivo.\n");
+        return 1;
+    }
+    
+    students line;
+    char tamanho[MAX_TAM];
+    
+    fgets(tamanho, sizeof(tamanho), arquivo);
+    
+    fprintf(status, "Nome, Media, Situacao\n");
+    
+    while (fgets(tamanho, sizeof(tamanho), arquivo)) {
+        
+        char *token = strtok(tamanho, ",");
+        strcpy(line.nome, token);
+        token = strtok(NULL, ",");
+        strcpy(line.numero, token);
+        token = strtok(NULL, ",");
+        strcpy(line.curso, token);
+        token = strtok(NULL, ",");
+        strcpy(line.nota1, token);
+        token = strtok(NULL, ",");
+        strcpy(line.nota2, token);
+
+        
+        double nota1 = atof(line.nota1);
+        double nota2 = atof(line.nota2);
+
+        float media = (nota1 + nota2) / 2.0;
+
+        
+        const char *situacao;
+        if (media >= 7.0) {
+            situacao = "Aprovado";
+        } else {
+            situacao = "Reprovado";
+        }
+
+        fprintf(status, "%s,%.2f,%s\n", line.nome, media, situacao);
+    }
+
+    fclose(arquivo);
+    fclose(status);
+
+    printf("DEU BOM FAMILIA. OLHA ESSA MERDA DE SituacaoFinal.csv.\n");
+
+    return 0;
+}
