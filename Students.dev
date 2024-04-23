@@ -61,7 +61,7 @@ int main() {
     fclose(arquivo);
     fclose(status);
 
-    printf("DEU BOM FAMILIA. OLHA ESSA MERDA DE SituacaoFinal.csv.\n");
+    printf("DEU BOM FAMILIA. confira o arquivo SituacaoFinal.csv.\n");
 
     return 0;
 }
