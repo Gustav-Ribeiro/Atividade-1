@@ -12,24 +12,48 @@ typedef struct students {
     char nota2[50];
 } students;
 
+int abrirArquivos(FILE **arquivoEntrada, FILE **arquivoSaida);
+void processarDados(FILE *arquivoEntrada, FILE *arquivoSaida);
+const char *calcularSituacao(float media);
+
 int main() {
-    FILE *arquivo = fopen("DadosEntrada.csv", "r");
-    FILE *status = fopen("SituacaoFinal.csv", "w");
-    
-    if (arquivo == NULL || status == NULL) {
-        printf("Não foi possível abrir o arquivo.\n");
+    FILE *arquivoEntrada, *arquivoSaida;
+
+    if (abrirArquivos(&arquivoEntrada, &arquivoSaida) != 0) {
+        printf("Erro ao abrir os arquivos.\n");
         return 1;
     }
+
+    processarDados(arquivoEntrada, arquivoSaida);
+
+    fclose(arquivoEntrada);
+    fclose(arquivoSaida);
+
+    printf("DEU BOM FAMILIA. olhe o  arquivo SituacaoFinal.csv.\n");
+
+    return 0;
+}
+
+int abrirArquivos(FILE **arquivoEntrada, FILE **arquivoSaida) {
+    *arquivoEntrada = fopen("DadosEntrada.csv", "r");
+    *arquivoSaida = fopen("SituacaoFinal.csv", "w");
     
-    students line;
+    if (*arquivoEntrada == NULL || *arquivoSaida == NULL) {
+        return 1; 
+    }
+
+    return 0; 
+}
+
+void processarDados(FILE *arquivoEntrada, FILE *arquivoSaida) {
     char tamanho[MAX_TAM];
-    
-    fgets(tamanho, sizeof(tamanho), arquivo);
-    
-    fprintf(status, "Nome, Media, Situacao\n");
-    
-    while (fgets(tamanho, sizeof(tamanho), arquivo)) {
-        
+    students line;
+
+    fgets(tamanho, sizeof(tamanho), arquivoEntrada);
+
+    fprintf(arquivoSaida, "Nome,Media,Situacao\n");
+
+    while (fgets(tamanho, sizeof(tamanho), arquivoEntrada)) {
         char *token = strtok(tamanho, ",");
         strcpy(line.nome, token);
         token = strtok(NULL, ",");
@@ -41,27 +65,22 @@ int main() {
         token = strtok(NULL, ",");
         strcpy(line.nota2, token);
 
-        
         double nota1 = atof(line.nota1);
         double nota2 = atof(line.nota2);
 
         float media = (nota1 + nota2) / 2.0;
 
-        
-        const char *situacao;
-        if (media >= 7.0) {
-            situacao = "Aprovado";
-        } else {
-            situacao = "Reprovado";
-        }
+        const char *situacao = calcularSituacao(media);
 
-        fprintf(status, "%s,%.2f,%s\n", line.nome, media, situacao);
+        fprintf(arquivoSaida, "%s,%.2f,%s\n", line.nome, media, situacao);
     }
-
-    fclose(arquivo);
-    fclose(status);
-
-    printf("DEU BOM FAMILIA. confira o arquivo SituacaoFinal.csv.\n");
-
-    return 0;
 }
+
+const char *calcularSituacao(float media) {
+    if (media >= 7.0) {
+        return "Aprovado";
+    } else {
+        return "Reprovado";
+    }
+}
+
